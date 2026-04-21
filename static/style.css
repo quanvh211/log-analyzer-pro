@@ -1,0 +1,46 @@
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+
+h1 {
+    color: #22c55e;
+}
+
+button {
+    padding: 8px;
+    margin: 5px;
+    background: #22c55e;
+    border: none;
+    border-radius: 5px;
+}
+
+.stats {
+    margin: 15px;
+}
+
+table {
+    width: 90%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+}
+
+.danger {
+    color: red;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 5px;
+}
+
+.HIGH { background: red; }
+.MEDIUM { background: orange; }
+.LOW { background: green; }

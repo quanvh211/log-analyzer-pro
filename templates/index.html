@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Security Dashboard</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>🔐 Security Dashboard</h1>
+
+<form method="POST" enctype="multipart/form-data">
+<input type="file" name="logfile" required>
+<button type="submit">Analyze</button>
+</form>
+
+{% if total %}
+<div class="stats">
+    <div>Total: {{ total }}</div>
+    <div>Unique IP: {{ unique }}</div>
+    <div>Threats: {{ suspicious_count }}</div>
+</div>
+{% endif %}
+
+<input type="text" id="search" placeholder="Search IP...">
+
+{% if chart_data %}
+<canvas id="chart"></canvas>
+{% endif %}
+
+{% if result %}
+<table>
+<tr>
+<th>IP</th>
+<th>Requests</th>
+<th>Threat</th>
+<th>Attack</th>
+<th>Action</th>
+</tr>
+
+{% for ip, count in result.items() %}
+<tr class="{% if ip in suspicious %}danger{% endif %}">
+<td>{{ ip }}</td>
+<td>{{ count }}</td>
+
+<td>
+<span class="badge {{ threat_levels[ip] }}">
+{{ threat_levels[ip] }}
+</span>
+</td>
+
+<td>
+{{ attacks[ip] if ip in attacks else "Normal" }}
+</td>
+
+<td>
+<button onclick="blockIP('{{ ip }}')">Block</button>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+{% endif %}
+
+<button onclick="downloadReport()">Export Report</button>
+
+</div>
+
+<script>
+{% if chart_data %}
+const chartData = {{ chart_data | tojson | safe }};
+const ctx = document.getElementById("chart");
+
+if (ctx) {
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: "Requests",
+                data: chartData.values,
+                backgroundColor: "rgba(34,197,94,0.7)"
+            }]
+        }
+    });
+}
+{% endif %}
+
+function blockIP(ip){
+    alert("🚫 Blocked: " + ip);
+}
+
+function downloadReport(){
+    let text = document.body.innerText;
+    let blob = new Blob([text], {type: "text/plain"});
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "report.txt";
+    link.click();
+}
+
+document.getElementById("search").addEventListener("keyup", function(){
+    let value = this.value.toLowerCase();
+    document.querySelectorAll("table tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+});
+</script>
+
+</body>
+</html>
